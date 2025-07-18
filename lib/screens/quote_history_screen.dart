@@ -35,7 +35,9 @@ class _QuoteHistoryScreenState extends State<QuoteHistoryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_language == 'es' ? 'Historial de citas' : 'Quote History'),
+        title: Text(
+          _language == 'es' ? 'Historial de citas' : 'Quote History',
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_forever),
@@ -66,24 +68,35 @@ class _QuoteHistoryScreenState extends State<QuoteHistoryScreen> {
               ),
             )
           : ListView.builder(
-            itemCount: quoteProvider.history.length,
-            itemBuilder: (context, index) {
-              final quote = quoteProvider.history[index];
-              return Card(
-                key: ValueKey(quote.id), // ✅ clave única por cita
-                child: ListTile(
-                  title: Text('"${quote.quote}"'),
-                  subtitle: Text('— ${quote.author}'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: () {
-                      Share.share('"${quote.quote}"\n— ${quote.author}');
-                    },
+              padding: const EdgeInsets.all(16),
+              itemCount: quoteProvider.history.length,
+              itemBuilder: (context, index) {
+                final quote = quoteProvider.history[index];
+                return Card(
+                  key: ValueKey(quote.id),
+                  child: ListTile(
+                    title: Text('"${quote.quote}"'),
+                    subtitle: Text('— ${quote.author}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: () {
+                        final textToShare = '''
+                    ✨ ${_language == 'es' ? 'Una cita inspiradora desde QuickQuotes:' : 'An inspiring quote from QuickQuotes:'}
+
+                    "${quote.quote}"
+                    — ${quote.author}
+
+                    ${_language == 'es' 
+                      ? '📱 Descárgala en tu móvil y guarda tus citas favoritas.' 
+                      : '📱 Save and discover more quotes in your mobile.'}
+                    ''';
+                        Share.share(textToShare);
+                      },
+                    ),
                   ),
-                ),
-              );
-            },
-          )
+                );
+              },
+            ),
     );
   }
 }

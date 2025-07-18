@@ -5,11 +5,9 @@ import '../models/quote.dart';
 
 class QuoteDatabaseHelper {
   static final QuoteDatabaseHelper instance = QuoteDatabaseHelper._internal();
-
   factory QuoteDatabaseHelper() => instance;
 
   static Database? _database;
-
   QuoteDatabaseHelper._internal();
 
   Future<Database> get database async {
@@ -42,6 +40,17 @@ class QuoteDatabaseHelper {
   Future<int> insertQuote(QuoteModel quote) async {
     final db = await database;
     return await db.insert('quotes', quote.toMap());
+  }
+
+  Future<bool> existsQuote(String quoteText) async {
+    final db = await database;
+    final result = await db.query(
+      'quotes',
+      where: 'quote = ?',
+      whereArgs: [quoteText],
+      limit: 1,
+    );
+    return result.isNotEmpty;
   }
 
   Future<List<QuoteModel>> getAllQuotes() async {

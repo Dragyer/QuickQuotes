@@ -1,8 +1,6 @@
-// === lib/main.dart ===
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:quickquotes/screens/authors_screen.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/preferences_screen.dart';
@@ -23,53 +21,23 @@ void main() {
   );
 }
 
-class QuickQuotesApp extends StatefulWidget {
+class QuickQuotesApp extends StatelessWidget {
   const QuickQuotesApp({super.key});
-
-  @override
-  State<QuickQuotesApp> createState() => _QuickQuotesAppState();
-}
-
-class _QuickQuotesAppState extends State<QuickQuotesApp> {
-  ThemeMode _themeMode = ThemeMode.light;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadThemePreference();
-  }
-
-  Future<void> _loadThemePreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isDark = prefs.getBool('darkMode') ?? false;
-    setState(() {
-      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    });
-  }
-
-  void _toggleTheme(bool isDarkMode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('darkMode', isDarkMode);
-    setState(() {
-      _themeMode = isDarkMode ? ThemeMode.dark : ThemeMode.light;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'QuickQuotes',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: _themeMode,
+      theme: AppTheme.lightTheme, // Solo tema claro
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeScreen(),
-        '/preferences': (context) => PreferencesScreen(onThemeChanged: _toggleTheme),
+        '/preferences': (context) => const PreferencesScreen(),
         '/about': (context) => const AboutScreen(),
         '/library': (context) => const QuotesLibraryScreen(),
         '/history': (context) => const QuoteHistoryScreen(),
+        '/authors': (context) => AuthorsScreen(),
       },
     );
   }

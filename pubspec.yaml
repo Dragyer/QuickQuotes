@@ -35,6 +35,11 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/bg_drawer.png
+    - assets/images/einstein.jpg
+    - assets/images/franklin.jpg
+    - assets/images/obama.jpg
+    - assets/images/ayn_rand.jpg
+    - assets/images/anne_frank.jpg
 
   uses-material-design: true
 

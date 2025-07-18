@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../widgets/app_drawer.dart';
 
 class PreferencesScreen extends StatefulWidget {
-  final Function(bool) onThemeChanged;
-
-  const PreferencesScreen({super.key, required this.onThemeChanged});
+  const PreferencesScreen({super.key});
 
   @override
   State<PreferencesScreen> createState() => _PreferencesScreenState();
 }
 
 class _PreferencesScreenState extends State<PreferencesScreen> {
-  bool _isDarkMode = false;
   String _selectedLanguage = 'es';
   bool _soundEnabled = true;
   bool _rememberLastScreen = false;
@@ -32,7 +28,6 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   Future<void> loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isDarkMode = prefs.getBool('darkMode') ?? false;
       _selectedLanguage = prefs.getString('language') ?? 'es';
       _soundEnabled = prefs.getBool('soundEnabled') ?? true;
       _rememberLastScreen = prefs.getBool('rememberLastScreen') ?? false;
@@ -41,18 +36,15 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
 
   Future<void> savePreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('darkMode', _isDarkMode);
     await prefs.setString('language', _selectedLanguage);
     await prefs.setBool('soundEnabled', _soundEnabled);
     await prefs.setBool('rememberLastScreen', _rememberLastScreen);
-    widget.onThemeChanged(_isDarkMode);
   }
 
   Future<void> resetPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     await loadPreferences();
-    widget.onThemeChanged(false);
   }
 
   @override
@@ -64,21 +56,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            SwitchListTile(
-              title: Text(_selectedLanguage == 'es' ? 'Tema oscuro' : 'Dark mode'),
-              value: _isDarkMode,
-              onChanged: (value) {
-                setState(() => _isDarkMode = value);
-                savePreferences();
-              },
-            ),
-            const SizedBox(height: 10),
             Row(
               children: [
-                Text(
-                  _selectedLanguage == 'es' ? 'Idioma:' : 'Language:',
-                  style: const TextStyle(fontSize: 16),
-                ),
+                Text(_selectedLanguage == 'es' ? 'Idioma: ' : 'Language: ', style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 10),
                 DropdownButton<String>(
                   value: _selectedLanguage,
@@ -116,7 +96,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             ElevatedButton.icon(
               icon: const Icon(Icons.refresh),
               label: Text(_selectedLanguage == 'es' ? 'Restablecer ajustes' : 'Reset settings'),
-              onPressed: () => resetPreferences(),
+              onPressed: resetPreferences,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.brown[300],
               ),

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +27,40 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     loadPreferences().then((_) => fetchQuote());
   }
+  Future<void> _handleOfflineFallback() async {
+    final continuar = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(_language == 'es' ? 'Sin conexión' : 'No Connection'),
+          content: Text(_language == 'es'
+              ? 'No se pudo conectar a internet.\n¿Deseas continuar en modo sin conexión?'
+              : 'Internet connection failed.\nDo you want to continue in offline mode?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(_language == 'es' ? 'Cancelar' : 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(_language == 'es' ? 'Continuar' : 'Continue'),
+            ),
+          ],
+        );
+      },
+    );
 
+    if (continuar == true) {
+      final prefs = await SharedPreferences.getInstance();
+      final lastQuote = prefs.getString('last_quote') ?? '';
+      final lastAuthor = prefs.getString('last_author') ?? '';
+      setState(() {
+        _quote = lastQuote;
+        _author = lastAuthor;
+      });
+    }
+  }
   Future<void> loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -41,25 +76,26 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setString('last_author', author);
   }
 
-  Future<void> fetchQuote() async {
-    final result = await QuoteService.getQuoteOfTheDay();
-    if (result != null) {
+Future<void> fetchQuote() async {
+  final url = Uri.parse('https://zenquotes.io/api/today');
+  try {
+    final response = await http.get(url).timeout(const Duration(seconds: 5));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final quote = data[0]['q'];
+      final author = data[0]['a'];
       setState(() {
-        _quote = result['quote']!;
-        _author = result['author']!;
+        _quote = quote;
+        _author = author;
       });
-      await saveQuote(_quote, _author);
-      Provider.of<QuoteProvider>(context, listen: false).addQuote(
-        QuoteModel(quote: _quote, author: _author),
-      );
+      await saveQuote(quote, author);
     } else {
-      setState(() {
-        _quote = _language == 'es'
-            ? 'Error al obtener la cita'
-            : 'Error retrieving quote';
-      });
+      await _handleOfflineFallback();
     }
+  } catch (e) {
+    await _handleOfflineFallback();
   }
+}
 
   String _getTodayDate() {
     final now = DateTime.now();
@@ -123,8 +159,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 30),
                 ElevatedButton.icon(
                   onPressed: () {
-                    final textToShare = '"$_quote"\n— $_author';
-                    Share.share(textToShare);
+                    final textToShare = '''
+                      ✨ ${_language == 'es' ? 'Una cita inspiradora desde QuickQuotes:' : 'An inspiring quote from QuickQuotes:'}
+
+                      "$_quote"
+                      — $_author
+
+                      ${_language == 'es' 
+                        ? '📱 Descárgala en tu móvil y guarda tus citas favoritas.' 
+                        : '📱 Save and discover more quotes in your mobile.'}
+                      ''';
+
+                      Share.share(textToShare);
                   },
                   icon: const Icon(Icons.share),
                   label: Text(_language == 'es' ? 'Compartir' : 'Share'),

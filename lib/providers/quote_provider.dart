@@ -13,8 +13,11 @@ class QuoteProvider with ChangeNotifier {
   }
 
   Future<void> addQuote(QuoteModel quote) async {
-    await QuoteDatabaseHelper.instance.insertQuote(quote);
-    await loadQuotesFromDb();
+    final exists = await QuoteDatabaseHelper.instance.existsQuote(quote.quote);
+    if (!exists) {
+      await QuoteDatabaseHelper.instance.insertQuote(quote);
+      await loadQuotesFromDb();
+    }
   }
 
   Future<void> clearHistory() async {

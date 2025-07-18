@@ -70,6 +70,13 @@ class _AppDrawerState extends State<AppDrawer> {
             title: Text(_language == 'es' ? 'Acerca de' : 'About'),
             onTap: () => Navigator.pushReplacementNamed(context, '/about'),
           ),
+          ListTile(
+            leading: const Icon(Icons.person_search),
+            title: Text(_language == 'es' ? 'Autores' : 'Authors'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/authors');
+            },
+          ),
         ],
       ),
     );

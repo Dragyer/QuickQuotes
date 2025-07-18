@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quickquotes/models/quote.dart';
+import 'package:quickquotes/providers/quote_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -41,36 +44,47 @@ class _QuotesLibraryScreenState extends State<QuotesLibraryScreen> {
         _randomQuote = result['quote']!;
         _randomAuthor = result['author']!;
       });
-    } else {
-      setState(() {
-        _randomQuote = _language == 'es'
-            ? 'Error de conexión'
-            : 'Connection error';
-        _randomAuthor = '';
-      });
+
+      final provider = Provider.of<QuoteProvider>(context, listen: false);
+      final newQuote = QuoteModel(
+        quote: _randomQuote,
+        author: _randomAuthor,
+      );
+      await provider.addQuote(newQuote);
     }
   }
 
+
   Future<void> fetchQuoteList() async {
     List<Map<String, String>> quotes = [];
+    final provider = Provider.of<QuoteProvider>(context, listen: false);
+
     for (int i = 0; i < 10; i++) {
       final result = await QuoteService.getRandomQuote();
       if (result != null) {
         quotes.add(result);
+
+        // Guardar en historial
+        final newQuote = QuoteModel(
+          quote: result['quote']!,
+          author: result['author']!,
+        );
+        await provider.addQuote(newQuote);
       }
-      await Future.delayed(const Duration(milliseconds: 100));
     }
+
     setState(() {
       _quoteList = quotes;
     });
-    print('Se cargaron ${_quoteList.length} citas aleatorias');
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_language == 'es' ? 'Explorar citas' : 'Explore Quotes'),
+        title:
+            Text(_language == 'es' ? 'Explorar citas' : 'Explore Quotes'),
       ),
       drawer: AppDrawer(),
       body: RefreshIndicator(
@@ -83,11 +97,11 @@ class _QuotesLibraryScreenState extends State<QuotesLibraryScreen> {
           children: [
             Text(
               _language == 'es' ? 'Cita aleatoria' : 'Random Quote',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Card(
-              elevation: 4,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -96,14 +110,13 @@ class _QuotesLibraryScreenState extends State<QuotesLibraryScreen> {
                     Text(
                       '"$_randomQuote"',
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontStyle: FontStyle.italic,
-                      ),
+                          fontSize: 18, fontStyle: FontStyle.italic),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '— $_randomAuthor',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style:
+                          const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Align(
@@ -111,7 +124,17 @@ class _QuotesLibraryScreenState extends State<QuotesLibraryScreen> {
                       child: IconButton(
                         icon: const Icon(Icons.share),
                         onPressed: () {
-                          Share.share('"$_randomQuote"\n— $_randomAuthor');
+                          final textToShare = '''
+                      ✨ ${_language == 'es' ? 'Una cita inspiradora desde QuickQuotes:' : 'An inspiring quote from QuickQuotes:'}
+
+                      "$_randomQuote"
+                      — $_randomAuthor
+
+                      ${_language == 'es' 
+                        ? '📱 Descárgala en tu móvil y guarda tus citas favoritas.' 
+                        : '📱 Save and discover more quotes in your mobile.'}
+                      ''';
+                          Share.share(textToShare);
                         },
                       ),
                     )
@@ -122,7 +145,8 @@ class _QuotesLibraryScreenState extends State<QuotesLibraryScreen> {
             const SizedBox(height: 24),
             Text(
               _language == 'es' ? 'Lista de citas' : 'Quote List',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             ..._quoteList.map(
@@ -134,7 +158,17 @@ class _QuotesLibraryScreenState extends State<QuotesLibraryScreen> {
                   trailing: IconButton(
                     icon: const Icon(Icons.share),
                     onPressed: () {
-                      Share.share('"${q['quote']}"\n— ${q['author']}');
+                      final textToShare = '''
+                  ✨ ${_language == 'es' ? 'Una cita inspiradora desde QuickQuotes:' : 'An inspiring quote from QuickQuotes:'}
+
+                  "${q['quote']}"
+                  — ${q['author']}
+
+                  ${_language == 'es' 
+                    ? '📱 Descárgala en tu móvil y guarda tus citas favoritas.' 
+                    : '📱 Save and discover more quotes in your mobile.'}
+                  ''';
+                      Share.share(textToShare);
                     },
                   ),
                 ),

@@ -45,7 +45,7 @@ class _AboutScreenState extends State<AboutScreen> {
             const Divider(),
             ListTile(
               title: Text(_language == 'es' ? 'Desarrollado por' : 'Developed by'),
-              subtitle: const Text('Daniel Arias Silva (@das)'),
+              subtitle: const Text('Felipe Pérez Muñoz (@Pipe)'),
               leading: const Icon(Icons.person),
             ),
             const Divider(),
