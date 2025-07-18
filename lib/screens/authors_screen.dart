@@ -4,11 +4,11 @@ import 'author_quotes_screen.dart';
 
 class AuthorsScreen extends StatelessWidget {
   final List<Map<String, String>> authors = [
-    {'name': 'Albert Einstein', 'image': 'assets/authors/einstein.jpg'},
-    {'name': 'Benjamin Franklin', 'image': 'assets/authors/franklin.jpg'},
-    {'name': 'Barack Obama', 'image': 'assets/authors/obama.jpg'},
-    {'name': 'Ayn Rand', 'image': 'assets/authors/ayn_rand.jpg'},
-    {'name': 'Anne Frank', 'image': 'assets/authors/anne_frank.jpg'},
+    {'name': 'Albert Einstein', 'image': 'assets/images/einstein.jpg'},
+    {'name': 'Benjamin Franklin', 'image': 'assets/images/franklin.jpg'},
+    {'name': 'Barack Obama', 'image': 'assets/images/obama.jpg'},
+    {'name': 'Ayn Rand', 'image': 'assets/images/ayn_rand.jpg'},
+    {'name': 'Anne Frank', 'image': 'assets/images/anne_frank.jpg'},
   ];
 
   AuthorsScreen({super.key});
