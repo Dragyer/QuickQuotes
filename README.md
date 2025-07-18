@@ -34,7 +34,7 @@ lib/
 ├── db/
 │   └── quote_database_helper.dart
 ├── models/
-│   └── quote_model.dart
+│   └── quote.dart
 ├── providers/
 │   └── quote_provider.dart
 ├── screens/
