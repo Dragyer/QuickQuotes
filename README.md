@@ -67,6 +67,11 @@ lib/
 
 ---
 
+## Instalacion
+
+- Instalar APK en carpeta raiz del proyecto.
+
+---
 ## 🔗 API Utilizada
 
 - [ZenQuotes.io](https://zenquotes.io/)
@@ -82,16 +87,17 @@ lib/
 - Si no hay conexión, la app ofrece un **modo sin conexión** con la última cita cargada.
 - El historial de citas se guarda localmente usando SQLite y puede consultarse offline.
 - Si se realizan más de 5 peticiones a la API en menos de 30 segundos, no se mostrarán más citas debido a las limitaciones de la cuenta gratuita
+
 ---
 
 ## 👤 Autor
 
 **Felipe Pérez**  
 Estudiante de Ingeniería en Desarrollo de Videojuegos y Realidad Virtual  
-Universidad de Talca — Curso PDSO-2501
+Universidad de Talca — Curso Dispositivos Moviles
 
 ---
 
 ## 🎬 Video de Presentación
 
-****  
+**https://youtu.be/v4Pd-LBmTWU**  
